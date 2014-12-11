@@ -27,6 +27,21 @@ bucket.operationTimeout = 10000;
 userAuth.setBucket(bucket);
 var basic = auth.basic({ realm: "Sizmek" }, userAuth.authenticateUser);
 
+var checkUserFilter = function(req, res, next) {
+    console.log(req._parsedUrl.pathname);
+    if(req._parsedUrl.pathname === '/') {
+        console.log('not authenticating');
+        next();
+    } else {
+        console.log('authenticating');
+        var a = auth.connect(basic)
+        console.log(a);
+        return a;
+    }
+}
+
+//app.use(checkUserFilter);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -37,7 +52,8 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(auth.connect(basic));
+app.use('/user', auth.connect(basic));
+app.use('/couchbase', auth.connect(basic));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Make the Couchbase client accessible to the router
@@ -45,6 +61,7 @@ app.use(function(req,res,next){
     req.bucket = bucket;
     next();
 });
+
 app.use('/', routes);
 app.use('/users', users);
 app.use('/couchbase', couchbaseAPI);
