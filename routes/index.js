@@ -3,10 +3,10 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res) {
-  req.state.clusterUrl = "localhost:8091";
-  req.state.bucketName = "default";
-  req.state.bucketPassword = "";
-  console.log(req.state);
+  req.session.clusterUrl = "localhost:8091";
+  req.session.bucketName = "default";
+  req.session.bucketPassword = "";
+  console.log(req.session);
   res.render('index', { title: 'Data Admin' });
 });
 
