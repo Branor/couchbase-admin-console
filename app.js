@@ -6,25 +6,15 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var couchbase = require('couchbase');
 var auth = require('http-auth');
+var session = require('express-session');
 
 var app = express();
 
+var state = require('./utils/state')(app);
 var routes = require('./routes/index');
 var users = require('./routes/users');
-var couchbaseAPI = require('./routes/couchbase');
-var userAuth = require('./security/userAuth');
-
-// DB Connection strings
-var couchbaseURL = 'localhost:8091';
-var couchbaseBucket = 'default';
-
-var cluster = new couchbase.Cluster(couchbaseURL);
-var bucket = cluster.openBucket(couchbaseBucket, function(error) {
-    if (error) throw error;
-});
-bucket.operationTimeout = 10000;
-
-userAuth.setBucket(bucket);
+var couchbaseAPI = require('./routes/couchbase')(state);
+var userAuth = require('./security/userAuth')(couchbaseAPI);
 var basic = auth.basic({ realm: "Sizmek" }, userAuth.authenticateUser);
 
 // view engine setup
@@ -37,19 +27,17 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-//app.use('/user', auth.connect(basic));
+app.use(session({
+  secret: 'sizmek',
+  resave: false,
+  saveUninitialized: true
+}));
 app.use('/couchbase', auth.connect(basic));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Make the Couchbase client accessible to the router
-app.use(function(req,res,next){
-    req.bucket = bucket;
-    next();
-});
-
 app.use('/', routes);
 app.use('/users', users);
-app.use('/couchbase', couchbaseAPI);
+app.use('/couchbase', couchbaseAPI.router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
