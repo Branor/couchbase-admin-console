@@ -21,6 +21,16 @@ block content
         .col-sm-4
             .panel.panel-primary(ng-show="chosenBucket && chosenCluster")
                 .panel-heading.
-                    Go to Login
+                    Login
                 .panel-body
-                    button(ng-click="go()") Go
+                    form(role="form", action="/login", method="post")
+                        input(type="hidden", name="clusterUrl" ng-model="chosenCluster.url")
+                        input(type="hidden", name="bucketName" ng-model="chosenBucket.name")
+                        input(type="hidden", name="bucketPassword" ng-model="chosenBucket.password")
+                        .form-group
+                            label(for="username") Username:
+                            input.form-control(type="text", id="username", name="username", ng-model="username", placeholder="Username")
+                        .form-group
+                            label(for="password") Password:
+                            input.form-control(type="password", id="password", name="password", ng-model="password", placeholder="Password")
+                        button.btn.btn-primary(type="submit") Login

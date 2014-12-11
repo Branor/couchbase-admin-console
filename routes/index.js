@@ -7,7 +7,6 @@ module.exports = function(config) {
     req.session.clusterUrl = "localhost:8091";
     req.session.bucketName = "default";
     req.session.bucketPassword = "";
-    console.log(req.session);
     res.render('index', { title: 'Data Admin', clusters : JSON.stringify(config.clusters) });
   });
 

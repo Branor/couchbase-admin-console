@@ -2,6 +2,7 @@
 var util = require('util');
 var express = require('express');
 var router = express.Router();
+var couchbase = require('couchbase');
 
 module.exports = function(applicationState) {
     var state = applicationState;

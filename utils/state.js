@@ -1,8 +1,7 @@
-module.exports = function(application) {
-    var app = application;
-    var session = app.session;
+module.exports = function(getSession) {
 
     var getClusterUrl = function () {
+        var session = getSession();
         if(!session)
             return null;
         console.log(app, session);
@@ -10,6 +9,7 @@ module.exports = function(application) {
     }
 
     var getBucketName = function () {
+        var session = getSession();
         if(!session)
             return null;
 
@@ -17,6 +17,7 @@ module.exports = function(application) {
     }
 
     var getBucketPassword = function () {
+        var session = getSession();
         if(!session)
             return null;
 

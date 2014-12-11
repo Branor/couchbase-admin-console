@@ -6,10 +6,19 @@ html
         link(rel='stylesheet', href='/libs/bootstrap/dist/css/bootstrap-theme.min.css')
         link(rel='stylesheet', href='/stylesheets/style.css')
         script(type="text/javascript").
-            window.cac_clusters_list = !{clusters}
+            window.cac_clusters_list = !{clusters};
     body(ng-app="cacApp")
         header.container
             h1 Couchbase Admin Console
+        .container
+            if error
+                p.alert.alert-danger.alert-dismissible= error
+            if warning
+                p.alert.alert-warning.alert-dismissible= warning
+            if success
+                p.alert.alert-success.alert-dismissible= success
+            if notice
+                p.alert.alert-info.alert-dismissible= notice
         .container
             block content
         footer.container
