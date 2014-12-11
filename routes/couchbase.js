@@ -304,6 +304,7 @@ module.exports = function(applicationState) {
     router.post('/command', runCommand);
 
     return {
-        router : router    
+        router : router,
+        getBucket : getBucket   
     }
 }
