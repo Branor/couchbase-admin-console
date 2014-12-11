@@ -1,0 +1,15 @@
+doctype html
+html
+    head
+        title= title
+        link(rel='stylesheet', href='/stylesheets/style.css')
+    body
+        script(src='http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js')
+        script(src='/javascripts/global.js')
+        header
+          h1 Data Admin
+        .container
+          .main-content
+            block content
+        footer
+              p Couchbase Data Admin Console
