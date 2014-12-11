@@ -1,21 +1,26 @@
 extends layout
 
 block content
-    h1= title
-    p Welcome to our test
-
-    // Wrapper
-    #wrapper
-
-        // USER LIST
-        h2 User List
-        #userList
-            table
-                thead
-                    th UserName
-                    th Email
-                    th Delete?
-                tbody
-        // /USER LIST
-
-    // /WRAPPER
+    section.row(ng-controller="cacHomeCtrl")
+        .col-sm-4
+            .panel.panel-primary
+                .panel-heading.
+                    Choose a Cluster...
+                .panel-body
+                    ul.list-group
+                        li.list-group-item(ng-repeat="cluster in clusters", ng-class="{'list-group-item-info' : cluster.name == chosenCluster.name}", ng-click="chooseCluster(cluster)").
+                           {{cluster.name}}
+        .col-sm-4
+            .panel.panel-primary(ng-show="buckets.length > 0")
+                .panel-heading.
+                    Choose a Bucket...
+                .panel-body
+                    ul.list-group
+                        li.list-group-item(ng-repeat="bucket in buckets", ng-class="{'list-group-item-info' : bucket.name == chosenBucket.name}", ng-click="chooseBucket(bucket)").
+                            {{bucket.name}}
+        .col-sm-4
+            .panel.panel-primary(ng-show="chosenBucket && chosenCluster")
+                .panel-heading.
+                    Go to Login
+                .panel-body
+                    button(ng-click="go()") Go

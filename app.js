@@ -6,12 +6,13 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var couchbase = require('couchbase');
 var auth = require('http-auth');
+var config = require('./config/config');
 var session = require('express-session');
 
 var app = express();
 
 var state = require('./utils/state')(app);
-var routes = require('./routes/index');
+var routes = require('./routes/index')(config);
 var users = require('./routes/users');
 var couchbaseAPI = require('./routes/couchbase')(state);
 var userAuth = require('./security/userAuth')(couchbaseAPI);

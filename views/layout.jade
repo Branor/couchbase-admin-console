@@ -5,15 +5,17 @@ html
         link(rel='stylesheet', href='/libs/bootstrap/dist/css/bootstrap.min.css')
         link(rel='stylesheet', href='/libs/bootstrap/dist/css/bootstrap-theme.min.css')
         link(rel='stylesheet', href='/stylesheets/style.css')
-    body
-        header
-          h1 Data Admin
+        script(type="text/javascript").
+            window.cac_clusters_list = !{clusters}
+    body(ng-app="cacApp")
+        header.container
+            h1 Couchbase Admin Console
         .container
-          .main-content
             block content
-        footer
-              p Couchbase Data Admin Console
+        footer.container
+            p Couchbase Data Admin Console
         script(src='/libs/jquery/dist/jquery.min.js')
         script(src='/libs/bootstrap/dist/js/bootstrap.min.js')
         script(src='/libs/angular/angular.min.js')
-        script(src='/javascripts/global.js')
+        script(src='/app/app.js')
+        script(src='/app/home/cacHomeCtrl.js')

@@ -1,0 +1,36 @@
+{
+  "dev" : {
+    "clusters" : [
+      {
+        "name" : "localhost",
+        "url" : "http://localhost:8091",
+        "buckets" : [
+          { "name" : "default", "password" : "" },
+          { "name" : "testb01", "password" : "" },
+          { "name" : "testb02", "password" : "" },
+          { "name" : "testb03", "password" : "" }
+        ]
+      },
+      {
+        "name" : "test1",
+        "url" : "http://localhost:8091",
+        "buckets" : [
+          { "name" : "default", "password" : "" },
+          { "name" : "testb11", "password" : "" },
+          { "name" : "testb12", "password" : "" },
+          { "name" : "testb13", "password" : "" }
+        ]
+      },
+      {
+        "name" : "test2",
+        "url" : "http://localhost:8091",
+        "buckets" : [
+          { "name" : "default", "password" : "" },
+          { "name" : "testb21", "password" : "" },
+          { "name" : "testb22", "password" : "" },
+          { "name" : "testb23", "password" : "" }
+        ]
+      }
+    ]
+  }
+}
