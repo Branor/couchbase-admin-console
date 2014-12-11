@@ -27,21 +27,6 @@ bucket.operationTimeout = 10000;
 userAuth.setBucket(bucket);
 var basic = auth.basic({ realm: "Sizmek" }, userAuth.authenticateUser);
 
-var checkUserFilter = function(req, res, next) {
-    console.log(req._parsedUrl.pathname);
-    if(req._parsedUrl.pathname === '/') {
-        console.log('not authenticating');
-        next();
-    } else {
-        console.log('authenticating');
-        var a = auth.connect(basic)
-        console.log(a);
-        return a;
-    }
-}
-
-//app.use(checkUserFilter);
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
