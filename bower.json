@@ -1,0 +1,19 @@
+{
+  "name": "couchbase-admin-console",
+  "version": "0.0.0",
+  "homepage": "https://github.com/Branor/couchbase-admin-console",
+  "authors": [
+    "Eyal Ben Ivri <eyalb@sela.co.il>",
+    "David Ostrovsky <davido@couchbase.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/libs",
+    "test",
+    "tests"
+  ]
+}

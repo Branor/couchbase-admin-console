@@ -2,10 +2,10 @@ doctype html
 html
     head
         title= title
+        link(rel='stylesheet', href='/libs/bootstrap/dist/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/libs/bootstrap/dist/css/bootstrap-theme.min.css')
         link(rel='stylesheet', href='/stylesheets/style.css')
     body
-        script(src='http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js')
-        script(src='/javascripts/global.js')
         header
           h1 Data Admin
         .container
@@ -13,3 +13,7 @@ html
             block content
         footer
               p Couchbase Data Admin Console
+        script(src='/libs/jquery/dist/jquery.min.js')
+        script(src='/libs/bootstrap/dist/js/bootstrap.min.js')
+        script(src='/libs/angular/angular.min.js')
+        script(src='/javascripts/global.js')
