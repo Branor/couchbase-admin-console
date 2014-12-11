@@ -4,27 +4,77 @@ var express = require('express');
 var router = express.Router();
 var couchbase = require('couchbase');
 
-module.exports = function(applicationState) {
-    var state = applicationState;
+module.exports = function() {
     // This enum represents the possible action types for documents
     var commandTypes = Object.freeze({'addProperty': 1, 'removeProperty': 2, 'modifyProperty': 3});
 
     // Index page - gesture
-    var index = function (req, res) {
-        var bucket = req.bucket;
+    var index = function (request, responst) {
+        var bucket = request.bucket;
         var msg = 'Couchbase is connected: ' + bucket.connected;
-        res.send(msg);
+        response.send(msg);
     };
 
-    var getBucket = function() {   
-        var clusterUrl = state.getClusterUrl();
-        var bucketName = state.getBucketName();
-        var bucketPassword = state.getBucketPassword();
+    var getBucket = function(clusterUrl, bucketName, bucketPassword) {   
         var cluster = new couchbase.Cluster(clusterUrl);
         var bucket = cluster.openBucket(bucketName, bucketPassword, function(error) {
             if (error) throw error;
         });
         bucket.operationTimeout = 10000;
+
+        return bucket;
+    };
+
+    var findUser = function(cluster, bucket, bucketpass, user) {
+        var dfr = q.defer();
+
+        var bucket = getBucket(cluster, bucket, bucketpass);
+        if(!bucket)
+            dfr.reject("No bucket found");
+
+        bucket.get('cb::manager::users', function (error, result) {
+            if (error) {
+                dfr.info(error);
+                dfr.reject("Error finding Users document");
+            }
+            if (!result.value || !result.value[user]) {
+                dfr.reject("No user found");
+            }
+
+            dfr.resolve(result.value[user]);
+        });
+
+        return dfr.promise;
+    };
+
+    //define API functions
+    var authenticateUser = function (cluster, bucket, bucketpass, user, pass) {
+        var dfr = q.defer();
+
+        var bucket = getBucket(cluster, bucket, bucketpass);
+        if(!bucket) {
+            dfr.reject("No bucket found");
+        } else {
+            bucket.get('cb::manager::users', function (error, result) {
+                if (error) {
+                    dfr.info(error);
+                    dfr.reject("Error finding Users document");
+                }
+                if (!result.value || !result.value[user]) {
+                    dfr.reject("No user found");
+                }
+                var password = result.value[user];
+                bcrypt.compare(pass, password, function(err, valid) {
+                    if(valid) {
+                        dfr.resolve(user);
+                    } else {
+                        dfr.reject("Password mismatch");
+                    }
+                });
+            });
+        }
+
+        return dfr.promise;
     };
 
     var setValueByPath = function (object, path, value) {

@@ -12,19 +12,14 @@ var LocalStrategy = require('passport-local').Strategy;
 
 var app = express();
 
-var state = require('./utils/state')(function() {
-    console.log("getSession", app.session);
-    return app.session;
-});
-
 var routes = require('./routes/index')(config);
 var users = require('./routes/users');
-var couchbaseAPI = require('./routes/couchbase')(state);
-var userAuth = require('./security/userAuth')(couchbaseAPI);
+var couchbaseAPI = require('./routes/couchbase')();
+var userAuth = require('./security/userAuth')();
 
 passport.use(new LocalStrategy(
     function(username, password, done) {
-        userAuth.authenticateUser(username, password)
+        couchbase.authenticateUser(cluster, bucket, bucketpass, username, password)
             .then(function(user) {
                 return done(null, user);
             }).catch(function(err) {
