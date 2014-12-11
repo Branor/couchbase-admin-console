@@ -5,7 +5,6 @@ var userAuth = require('../security/userAuth');
 var router = express.Router();
 
 var generateUser = function (request, response) {
-	console.log(request.body);
     var username = request.body.username;
     var password = request.body.password;
 
@@ -13,7 +12,7 @@ var generateUser = function (request, response) {
         if(error)
             return response.json(500, util.inspect(error));
         
-        response.json(200, result);
+        response.status(200).json(result);
     });
 }
 

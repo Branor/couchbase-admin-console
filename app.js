@@ -37,7 +37,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use('/user', auth.connect(basic));
+//app.use('/user', auth.connect(basic));
 app.use('/couchbase', auth.connect(basic));
 app.use(express.static(path.join(__dirname, 'public')));
 
