@@ -314,7 +314,6 @@ module.exports = function() {
         });
     };
 
-
     function deleteDocs(request, response) {
         var requestJson = request.body;
         var keysArray = new Array();
@@ -356,6 +355,7 @@ module.exports = function() {
 
     return {
         router : router,
-        getBucket : getBucket   
+        findUser : findUser,
+        authenticateUser : authenticateUser
     }
 }

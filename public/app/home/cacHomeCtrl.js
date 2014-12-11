@@ -18,7 +18,7 @@
         };
 
         $scope.go = function() {
-            console.log($scope.chosenCluster, $scope.chosenBucket);
+            console.log($scope.chosenCluster.url, $scope.chosenBucket.name, $scope.chosenBucket.password);
         };
     }
 })();

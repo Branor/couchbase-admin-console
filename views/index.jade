@@ -24,13 +24,13 @@ block content
                     Login
                 .panel-body
                     form(role="form", action="/login", method="post")
-                        input(type="hidden", name="clusterUrl" ng-model="chosenCluster.url")
-                        input(type="hidden", name="bucketName" ng-model="chosenBucket.name")
-                        input(type="hidden", name="bucketPassword" ng-model="chosenBucket.password")
+                        input(type="hidden", name="clusterUrl", value="{{chosenCluster.url}}")
+                        input(type="hidden", name="bucketName", value="{{chosenBucket.name}}")
+                        input(type="hidden", name="bucketPassword", value="{{chosenBucket.password}}")
                         .form-group
                             label(for="username") Username:
                             input.form-control(type="text", id="username", name="username", ng-model="username", placeholder="Username")
                         .form-group
                             label(for="password") Password:
                             input.form-control(type="password", id="password", name="password", ng-model="password", placeholder="Password")
-                        button.btn.btn-primary(type="submit") Login
+                        button.btn.btn-primary(type="submit", ng-click="go()") Login

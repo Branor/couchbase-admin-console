@@ -17,8 +17,12 @@ var users = require('./routes/users');
 var couchbaseAPI = require('./routes/couchbase')();
 var userAuth = require('./security/userAuth')();
 
-passport.use(new LocalStrategy(
-    function(username, password, done) {
+passport.use(new LocalStrategy({passReqToCallback: true},
+    function(req, username, password, done) {
+        if(!req.session) return done("No Session", null);
+        var cluster = req.session.clusterUrl,
+            bucket = req.session.bucketName,
+            bucketpass = req.session.bucketPass;
         couchbase.authenticateUser(cluster, bucket, bucketpass, username, password)
             .then(function(user) {
                 return done(null, user);
@@ -88,6 +92,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.post('/login', function(req, res, next) {
+    req.session.clusterUrl = req.body.clusterUrl;
+    req.session.bucketName = req.body.bucketName;
+    req.session.bucketPass = req.body.bucketPass;
+    console.log("req.session", req.body);
     passport.authenticate('local', function(err, user, info) {
         if (err || !user) {
             if(err) req.session.error = err;
@@ -96,8 +104,6 @@ app.post('/login', function(req, res, next) {
         }
         req.logIn(user, function(err) {
             if (err) { return next(err); }
-            req.session.clusterUrl = req.param('clusterUrl');
-            req.session.bucketName = req.param('bucketName');
             return res.redirect('/couchbase');
         });
     })(req, res, next);
