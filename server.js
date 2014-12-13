@@ -1,16 +1,16 @@
-#!/usr/bin/env node
-var debug = require('debug')('CouchbaseAdminConsole');
-var fs = require('fs');
+var express = require('express');
 var https = require('https');
-var app = require('./app');
 
-var options = {
-    key: fs.readFileSync('./security/privatekey.pem'),
-    cert: fs.readFileSync('./security/certificate.pem')
-};
+var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+var app = express();
 
-app.set('port', process.env.PORT || 3000);
+var config = require('./server/components/config')[env];
+var dbFactory = require('./server/components/couchbase')(config);
 
-var server = https.createServer(options,app).listen(app.get('port'), function() {
-  debug('Express server listening on port ' + server.address().port);
+require('./server/components/passport')(dbFactory);
+require('./server/components/express')(app, config);
+require('./server/components/routes')(app, dbFactory, config);
+
+var server = https.createServer(config.certificateOptions, app).listen(config.port, function() {
+    console.log('Express server listening on port ' + server.address().port);
 });

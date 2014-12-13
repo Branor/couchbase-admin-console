@@ -23,7 +23,7 @@ passport.use(new LocalStrategy({passReqToCallback: true},
         var cluster = req.session.clusterUrl,
             bucket = req.session.bucketName,
             bucketpass = req.session.bucketPass;
-        couchbase.authenticateUser(cluster, bucket, bucketpass, username, password)
+        couchbaseAPI.authenticateUser(cluster, bucket, bucketpass, username, password)
             .then(function(user) {
                 return done(null, user);
             }).catch(function(err) {
@@ -33,20 +33,21 @@ passport.use(new LocalStrategy({passReqToCallback: true},
 ));
 
 passport.serializeUser(function(user, done) {
+    console.log("serializeUser", user, arguments);
     done(null, user);
 });
 
 passport.deserializeUser(function(id, done) {
-    userAuth.findUser(id)
+    console.log("deserializeUser", arguments);
+    couchbaseAPI.findUser(id)
         .then(function(user) {
+            console.log("deserializeUser user", user);
             done(null, user);
         }).catch(function(err) {
+            console.log("deserializeUser err", err);
             done(err, null);
         });
 });
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -63,6 +64,9 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Session-persisted message middleware
 app.use(function(req, res, next){
@@ -82,7 +86,7 @@ app.use(function(req, res, next){
 });
 
 var authMiddleware = function (req, res, next) {
-    console.log("authMiddleware");
+    console.log("authMiddleware req.isAuthenticated()", req.isAuthenticated());
     if (req.isAuthenticated()) { return next(); }
     req.session.error = 'Please sign in!';
     res.redirect('/');
@@ -95,14 +99,19 @@ app.post('/login', function(req, res, next) {
     req.session.clusterUrl = req.body.clusterUrl;
     req.session.bucketName = req.body.bucketName;
     req.session.bucketPass = req.body.bucketPass;
-    console.log("req.session", req.body);
     passport.authenticate('local', function(err, user, info) {
-        if (err || !user) {
-            if(err) req.session.error = err;
-            else req.session.error = "No user found";
+        console.log("local authenticate", err, user, info);
+        if(err) {
+            console.log("Error while authenticting", err);
+            req.session.error = err.toString();
+            return res.redirect('/');
+        }
+        if (!user) {
+            req.session.error = "No user found";
             return res.redirect('/');
         }
         req.logIn(user, function(err) {
+            console.log("after logIn", req.isAuthenticated());
             if (err) { return next(err); }
             return res.redirect('/couchbase');
         });

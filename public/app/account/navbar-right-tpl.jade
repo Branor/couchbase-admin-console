@@ -1,0 +1,9 @@
+.navbar-right(ng-controller="cacNavBarCtrl")
+   ul.nav.navbar-nav(ng-show="identity.isAuthenticated()")
+      li.dropdown
+         a.dropdown-toggle(href="", data-toggle="dropdown")
+            | {{identity.currentUser.username + "@" + identity.currentUser.bucketName + "@" + identity.currentUser.clusterName}}
+            b.caret
+         ul.dropdown-menu(role="menu")
+            li
+               a(href="", ng-click="signout()") Logoff

@@ -1,0 +1,13 @@
+doctype
+html
+    head
+        title Couchbase Admin Console
+        link(rel="stylesheet", href="/libs/bootstrap/dist/css/bootstrap.min.css")
+        link(rel="stylesheet", href="/libs/bootstrap/dist/css/bootstrap-theme.min.css")
+        link(rel="stylesheet", href="/libs/toastr/toastr.min.css")
+        link(rel="stylesheet", href="/css/style.css")
+        base(href="/")
+    body(ng-app="cacApp")
+        include serverData
+        block main-content
+        include scripts

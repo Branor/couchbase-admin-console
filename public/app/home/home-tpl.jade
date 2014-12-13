@@ -1,0 +1,30 @@
+section.row(ng-controller="cacHomeCtrl")
+   .col-sm-4
+      .panel.panel-primary
+         .panel-heading.
+            Choose a Cluster...
+         .panel-body
+            ul.list-group
+               li.list-group-item(ng-repeat="cluster in clusters", ng-class="{'list-group-item-info' : cluster.name == chosenCluster.name}", ng-click="chooseCluster(cluster)").
+                  {{cluster.name}}
+   .col-sm-4
+      .panel.panel-primary(ng-show="buckets.length > 0")
+         .panel-heading.
+            Choose a Bucket...
+         .panel-body
+            ul.list-group
+               li.list-group-item(ng-repeat="bucket in buckets", ng-class="{'list-group-item-info' : bucket.name == chosenBucket.name}", ng-click="chooseBucket(bucket)").
+                  {{bucket.name}}
+   .col-sm-4
+      .panel.panel-primary(ng-show="chosenBucket && chosenCluster")
+         .panel-heading.
+            Login
+         .panel-body
+            form(role="form", ng-submit="signin()")
+               .form-group
+                  label(for="username") Username:
+                  input.form-control(type="text", id="username", name="username", ng-model="username", placeholder="Username")
+               .form-group
+                  label(for="password") Password:
+                  input.form-control(type="password", id="password", name="password", ng-model="password", placeholder="Password")
+               button.btn.btn-primary(type="submit") Login

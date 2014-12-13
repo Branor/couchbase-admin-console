@@ -1,0 +1,13 @@
+extends ../includes/layout
+
+block main-content
+   header.navbar.navbar-default.navbar-fixed-top
+      .container
+         .navbar-header
+            a.navbar-brand(href="/") Couchbase Admin Console
+         div(ng-include="'/partials/account/navbar-right-tpl'")
+   section#main.container(ng-view)
+
+   footer
+      .container
+         .text-center Couchbase Admin Console
