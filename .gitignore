@@ -1,3 +1,9 @@
+.DS_Store
+
+# We are using Jade and Stylus, so no HTML and CSS should be tracked.
+*.css
+*.html
+
 #IDEs
 .idea
 
