@@ -1,44 +1,62 @@
 form(role="form")
    .row.form-group
       label(for="cacQuery") Query
-      textarea#cacQuery.form-control(ng-model=cacQuery, placeholder="Query...")
+      textarea#cacQuery.form-control(ng-model=cacQuery, placeholder="Query...", ng-disabled="dataSubmit")
    .row
       .col-sm-6
          .form-group
             label(for="cacPropertyName") Property Name
-            input#cacPropertyName.form-control(type="text", ng-model="cacPropertyName", placeholder="Property Name")
+            input#cacPropertyName.form-control(type="text", ng-model="cacPropertyName", placeholder="Property Name", ng-disabled="dataSubmit")
       .col-sm-6(ng-hide="showPropertyCustom()")
          .form-group
             label(for="cacPropertyValue") Property Value
-            input#cacPropertyValue.form-control(type="text", ng-model="cacPropertyValue", placeholder="Property Value")
+            input#cacPropertyValue.form-control(type="text", ng-model="cacPropertyValue", placeholder="Property Value", ng-disabled="dataSubmit")
       .col-sm-6(ng-show="showPropertyCustom()")
          .form-group
             label(for="cacPropertyCustom") Property Expression
-            textarea#cacPropertyCustom.form-control(ng-model="cacPropertyCustom", placeholder="Property Custom")
+            textarea#cacPropertyCustom.form-control(ng-model="cacPropertyCustom", placeholder="Property Custom", ng-disabled="dataSubmit")
    .row.radio
       label
-         input(type="radio",name="cacActionType", ng-model="cacActionType", value="add")
+         input(type="radio",name="cacActionType", ng-model="cacActionType", value="add", ng-disabled="dataSubmit")
          |Add Property
    .row.radio
       label
-         input(type="radio",name="cacActionType", ng-model="cacActionType", value="delete")
+         input(type="radio",name="cacActionType", ng-model="cacActionType", value="delete", ng-disabled="dataSubmit")
          |Delete Property
    .row.radio
       label
-         input(type="radio",name="cacActionType", ng-model="cacActionType", value="change-type")
+         input(type="radio",name="cacActionType", ng-model="cacActionType", value="change-type", ng-disabled="dataSubmit")
          |Change Property Type
    .row.radio
       label
-         input(type="radio",name="cacActionType", ng-model="cacActionType", value="change-value")
+         input(type="radio",name="cacActionType", ng-model="cacActionType", value="change-value", ng-disabled="dataSubmit")
          |Change Property Value
    .row.radio
       label
-         input(type="radio",name="cacActionType", ng-model="cacActionType", value="change-custom")
+         input(type="radio",name="cacActionType", ng-model="cacActionType", value="change-custom", ng-disabled="dataSubmit")
          |Change Property Value - Custom
    .row
       .col-sm-3.col-sm-push-5.btn-group
-         label.btn(ng-class="{'btn-danger' : !cacDryRun, 'btn-info' : cacDryRun}")
+         label.btn(ng-class="{'btn-danger' : !cacDryRun, 'btn-info' : cacDryRun}", ng-disabled="dataSubmit")
             input#dry-run-chck(type="checkbox", ng-model="cacDryRun")
             |Dry Run
-         button.btn(ng-class="{'btn-danger' : !cacDryRun, 'btn-info' : cacDryRun}")
-            |Submit
+         button#cacSubmitBtn.btn(ng-class="{'btn-danger' : !cacDryRun, 'btn-info' : cacDryRun}", ng-click="submit()", ng-disabled="dataSubmit")
+            |{{dataSubmit ? "Loading..." : "Submit"}}
+
+#resultsWindow.modal.fade(tabindex="-1", role="dialog", aria-labelledby="myModalLabel", aria-hidden="true")
+   .modal-dialog
+      .modal-content
+         .modal-header
+            button.close(type="button", data-dismiss="modal")
+               span(aria-hidden="true")
+                  |&times;
+               span.sr-only
+                  |Close
+            h4#myModalLabel.modal-title
+               |Query Results
+
+         .modal-body
+            |{{queryResults}}
+         .modal-footer
+            button.btn.btn-default(type="button", data-dismiss="modal")
+               |Close
