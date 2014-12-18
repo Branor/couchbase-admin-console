@@ -135,9 +135,7 @@ module.exports = function(config){
         };
 
         self.executeCustomExpression = function(doc, path, expression) {
-            console.log("executeCustomExpression before", doc, expression);
             vm.runInNewContext(expression, {doc: doc}, self.config.customStackTraceFile);
-            console.log("executeCustomExpression after", doc, expression);
             return doc;
         };
 

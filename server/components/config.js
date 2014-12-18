@@ -14,7 +14,7 @@ module.exports = {
         port : process.env.PORT || 3000,
         clusters : clusters,
         certificateOptions : certificateOptions,
-        maxProcessingParallelism : 10,
+        maxProcessingParallelism : 100,
         maxDocumentUpdateRetries : 100,
         customStackTraceFile : rootPath + 'vm.log'
     },
@@ -23,7 +23,7 @@ module.exports = {
         port : process.env.PORT || 80,
         clusters : clusters,
         certificateOptions : certificateOptions,
-        maxProcessingParallelism : 10,
+        maxProcessingParallelism : 100,
         maxDocumentUpdateRetries : 100,
         customStackTraceFile : rootPath + 'vm.log'
     }
