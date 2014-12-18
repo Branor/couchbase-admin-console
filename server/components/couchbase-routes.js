@@ -3,7 +3,7 @@ var _ = require('underscore');
 module.exports = function(baseUrl, app, dbFactory) {
 
     var getDb = function(request) {
-        return new dbFactory.db(request.session.clusterName, request.session.bucketName);
+        return new dbFactory.db(request.session.userObj.clusterName, request.session.userObj.bucketName);
     };
 
     var getById = function (request, response) {
@@ -84,17 +84,23 @@ module.exports = function(baseUrl, app, dbFactory) {
             }
             response.end();
         });
-    }
+    };
 
     var runQuery = function (request, response) {
         var db = getDb(request);
-        db.runNickelQuery(request.body, 0, function (error, result) {
-            if (error) {
-                response.json(500, util.inspect(error));
-            } else {
-                response.json(result);
-            }
-        });
+        console.log("runQuery", request.session);
+        db.runCommand(request.body.predicate,
+                      request.body.propName,
+                      request.body.propVal,
+                      request.body.queryType,
+                      request.body.dryRun,
+                        function (error, result) {
+                            if (error) {
+                                response.json(500, util.inspect(error));
+                            } else {
+                                response.json(result);
+                            }
+                        });
     };
 
     var runCommand = function (request, response) {
