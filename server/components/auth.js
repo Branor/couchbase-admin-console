@@ -8,6 +8,8 @@ function authenticate(req, res, next) {
             else {
                 req.logIn(user, function(err) {
                     if(err) { return next(err); }
+                    //console.log("authenticate", user, req.session);
+                    req.session.userObj = user;
                     res.send({ success : true, user : user});
                 });
             }
@@ -15,8 +17,7 @@ function authenticate(req, res, next) {
     });
 
     auth(req, res, next);
-};
-
+}
 
 function requiresApiRole(role) {
     return function(req, res, next) {

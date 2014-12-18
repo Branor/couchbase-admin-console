@@ -3,8 +3,8 @@ form(role="form")
       .col-sm-12
          .col-sm-12
             .form-group
-               label(for="cacQuery") Query
-               textarea#cacQuery.form-control(ng-model=cacQuery, placeholder="Query...", ng-disabled="dataSubmit")
+               label(for="cacQuery") SELECT doc FROM {{identity.currentUser.bucketName}} WHERE {{cacQuery ? cacQuery : '...'}}
+               textarea#cacQuery.form-control(ng-model="cacQuery", placeholder="doc.field = value", ng-disabled="dataSubmit")
    .row
       .col-sm-6
          .col-sm-12
@@ -21,11 +21,6 @@ form(role="form")
                label
                   input(type="radio",name="cacActionType", ng-model="cacActionType", value="delete", ng-disabled="dataSubmit")
                   |Delete Property
-         .col-sm-12
-            .radio
-               label
-                  input(type="radio",name="cacActionType", ng-model="cacActionType", value="change-type", ng-disabled="dataSubmit")
-                  |Change Property Type
          .col-sm-12
             .radio
                label

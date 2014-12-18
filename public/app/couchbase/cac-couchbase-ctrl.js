@@ -1,28 +1,40 @@
 (function() {
     'use strict';
 
-    angular.module('cacApp').controller('cacCouchbaseCtrl', ['$scope', '$location', '$timeout', 'cacIdentity', cacCouchbaseCtrl]);
+    angular.module('cacApp').controller('cacCouchbaseCtrl', ['$scope', '$location', 'cacDataContext', 'cacIdentity', cacCouchbaseCtrl]);
 
-    function cacCouchbaseCtrl($scope, $location, $timeout, cacIdentity) {
+    function cacCouchbaseCtrl($scope, $location, cacDataContext, cacIdentity) {
         if(!cacIdentity.isAuthenticated()) {
             //$location.path('/');
         }
 
+        $scope.cacQuery = "";
+        $scope.cacPropertyName = "";
+        $scope.cacPropertyValue = "";
+        $scope.cacPropertyCustom = "";
         $scope.cacActionType = "add";
         $scope.cacDryRun = true;
         $scope.dataSubmit = false;
-
+        $scope.identity = cacIdentity;
         $scope.showPropertyCustom = function() {
             return $scope.cacActionType == 'change-custom';
         };
 
         $scope.submit = function() {
             $scope.dataSubmit = true;
-            $timeout(function() {
-                var options = { keyboard : false };
-                $('#resultsWindow').modal(options);
-                $scope.dataSubmit = false;
-            }, 3000);
+            cacDataContext.runQuery($scope.cacQuery,
+                                    $scope.cacPropertyName,
+                                    $scope.showPropertyCustom() ? $scope.cacPropertyCustom : $scope.cacPropertyValue,
+                                    $scope.cacActionType,
+                                    $scope.cacDryRun)
+                .then(function(results) {
+                    $scope.queryResults = JSON.stringify(results);
+                }).catch(function(err) {
+                    $scope.queryResults = JSON.stringify(err);
+                }).finally(function() {
+                    $('#resultsWindow').modal({ keyboard : false });
+                    $scope.dataSubmit = false;
+                });
         };
     }
 
