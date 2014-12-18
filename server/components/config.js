@@ -13,12 +13,16 @@ module.exports = {
         rootPath : rootPath,
         port : process.env.PORT || 3000,
         clusters : clusters,
-        certificateOptions : certificateOptions
+        certificateOptions : certificateOptions,
+        maxProcessingParallelism : 10,
+        maxDocumentUpdateRetries : 100
     },
     production : {
         rootPath : rootPath,
         port : process.env.PORT || 80,
         clusters : clusters,
-        certificateOptions : certificateOptions
+        certificateOptions : certificateOptions,
+        maxProcessingParallelism : 10,
+        maxDocumentUpdateRetries : 100
     }
 };

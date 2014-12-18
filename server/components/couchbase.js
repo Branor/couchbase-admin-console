@@ -1,13 +1,19 @@
 var couchbase = require('couchbase'),
     _ = require('underscore'),
     q = require('q'),
-    helpers = require('./helpers');
+    helpers = require('./helpers'),
+    async = require('async');
 
 module.exports = function(config){
-    var clusters = config.clusters;
+    var config = config;
+
+    function getConfig() {
+        return config;
+    }
 
     function getBucketData(clusterName, bucketName) {
         var result = {};
+        var clusters = getConfig().clusters;
 
         for(var i = 0; i < clusters.length; ++i) {
             if(clusters[i].name == clusterName) {
@@ -28,9 +34,10 @@ module.exports = function(config){
 
     var db = function(clusterName, bucketName) {
         var self = this;
-        var bucketData = getBucketData(clusterName, bucketName);
-        var cluster = new couchbase.Cluster(bucketData.clusterUrl);
-        self.bucket = cluster.openBucket(bucketData.bucketName, bucketData.bucketPass, function(error) {
+        self.config = getConfig();
+        self.bucketData = getBucketData(clusterName, bucketName);
+        var cluster = new couchbase.Cluster(self.bucketData.clusterUrl);
+        self.bucket = cluster.openBucket(self.bucketData.bucketName, self.bucketData.bucketPass, function(error) {
             if (error) throw error;
         });
         self.bucket.operationTimeout = 10000;
@@ -81,14 +88,14 @@ module.exports = function(config){
             var o = object;
             for (var i = 0; i < a.length - 1; i++) {
                 var n = a[i];
-                if (n in o) {
-                    o = o[n];
-                } else {
+                if (!(n in o)) {
                     o[n] = {};
-                    o = o[n];
                 }
+                o = o[n];
             }
             o[a[a.length - 1]] = value;
+
+            return object;
         };
 
         self.getValueByPath = function (object, path) {
@@ -112,63 +119,89 @@ module.exports = function(config){
             var o = object;
             for (var i = 0; i < a.length - 1; i++) {
                 var n = a[i];
-                if (n in o) {
+                if (n in o)
                     o = o[n];
-                }
+                else 
+                    return object;
             }
             delete o[a[a.length - 1]];
+
+            return object;
         };
 
-        self.runNickelQuery = function(query, getOnlyIds, callback) {
-            var queryPredicates = self.getNickelCondition(query.predicates);
-            var limit = query.limitRows;
-            if (getOnlyIds == 1) {
-                if (limit) {
-                    var queryCode =
-                        'SELECT META().id AS docId, ' +
-                        'META().cas AS casValue ' +
-                        'FROM ' + bucket + ' ' +
-                        'WHERE ' + queryPredicates + ' ' +
-                        'LIMIT ' + limit;
-                } else {
-                    var queryCode =
-                        'SELECT META().id AS docId, ' +
-                        'META().cas AS casValue ' +
-                        'FROM ' + bucket + ' ' +
-                        'WHERE ' + queryPredicates;
-                }
-            } else {
-                if (limit) {
-                    var queryCode =
-                        'SELECT META().id AS docId, ' +
-                        'META().cas AS casValue,* ' +
-                        'FROM ' + bucket + ' ' +
-                        'WHERE ' + queryPredicates + ' ' +
-                        'LIMIT ' + limit;
-                } else {
-                    var queryCode =
-                        'SELECT META().id AS docId, ' +
-                        'META().cas AS casValue,* ' +
-                        'FROM ' + bucket + ' ' +
-                        'WHERE ' + queryPredicates;
-                }
+        self.executeCustomExpression = function(object, expression) {
+            // eval(expression, object)
+
+            return object;
+        };
+
+        self.runCommand = function(predicate, propName, propVal, queryType, dryRun, commandCallback) {
+            runNickelQuery(predicate, self.bucketData.bucketName, function (error, results) {
+                if(error)
+                    return commandCallback(error);
+
+                async.eachLimit(results, self.config.maxProcessingParallelism, 
+                    function (result, callback) {
+                        processData(result.docId, propName, propVal, queryType, dryRun, 0, callback);
+                    }, 
+                    function (err){
+                        commandCallback(err, results ? results.length : null);
+                    }
+                );
+            });
+        };
+
+        self.getProcessorFunction = function(queryType) {
+            switch(queryType) {
+                case 'add': return self.setValueByPath;
+                case 'change-value': return self.setValueByPath;
+                case 'delete': return self.deleteValueByPath;
+                case 'change-custom': return self.executeCustomExpression;
             }
+        };
+
+        self.processData = function(docId, propName, propVal, queryType, dryRun, tries, callback)
+        {
+            if(tries >= self.config.maxDocumentUpdateRetries)
+                return callback('Unable to update document ' + docId + ' in ' + tries + ' tries.');
+
+            var processor = getProcessorFunction(queryType);
+
+            self.bucket.get(docId, function (error, result) {
+                if(error)
+                    return callback(error);
+   
+                doc = processor(result.value, propName, propVal);
+                if(dryRun)
+                    return callback();
+
+                self.bucket.set(docId, doc, {cas : result.cas}, function (err, res) {
+                    if(err)
+                        if(err.code == couchbase.errors.keyAlreadyExists)
+                            return processData(docId, propName, propVal, queryType, dryRun, tries + 1, callback);
+                        else
+                            return callback(err);
+                    return callback();
+                });
+            });
+        };
+ 
+        self.runNickelQuery = function(query, bucket, callback) {
+            var queryCode =
+                'SELECT META().id AS docId, ' +
+                'META().cas AS casValue ' +
+                'FROM ' + bucket + ' ' +
+                'WHERE ' + query;
 
             self.bucket.query(queryCode, function (error, result) {
                 console.log('Executing N1QL: ' + queryCode);
                 if (error) {
                     console.log('N1QL - ' + error);
                 }
-                var parsedResult = util.inspect(result);
+                console.log(util.inspect(result));
                 callback(error, result);
             });
         };
-
-        self.getNickelCondition = function(node) {
-            if (typeof node == 'object' && node.op != 'undefined' && node.param1 != 'undefined' && node.param2 != 'undefined')
-                return " ( " + self.getNickelCondition(node.param1) + " " + node.op + " " + self.getNickelCondition(node.param2) + " ) ";
-            else return node;
-        }
     };
 
     return {

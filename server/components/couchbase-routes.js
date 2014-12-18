@@ -2,8 +2,6 @@ var _ = require('underscore');
 
 module.exports = function(baseUrl, app, dbFactory) {
 
-    var commandTypes = Object.freeze({'addProperty': 1, 'removeProperty': 2, 'modifyProperty': 3});
-
     var getDb = function(request) {
         return new dbFactory.db(request.session.clusterName, request.session.bucketName);
     };
