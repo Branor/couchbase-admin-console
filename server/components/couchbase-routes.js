@@ -90,17 +90,16 @@ module.exports = function(baseUrl, app, dbFactory) {
 
     var runQuery = function (request, response) {
         var db = getDb(request);
-        console.log("runQuery", request.session);
         db.runCommand(request.body.predicate,
                       request.body.propName,
                       request.body.propVal,
                       request.body.queryType,
                       request.body.dryRun,
-                        function (error, result) {
+                        function (error, docCount) {
                             if (error) {
-                                response.json(500, util.inspect(error));
+                                response.json(500, {error: error, documentCount: docCount});
                             } else {
-                                response.json(result);
+                                response.json({documentCount: docCount});
                             }
                         });
     };
