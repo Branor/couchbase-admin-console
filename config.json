@@ -1,7 +1,8 @@
 [
   {
     "name" : "localhost",
-    "url" : "http://localhost:8091",
+    "url" : "localhost:8091",
+    "nickelUrl" : "localhost:8093",
     "buckets" : [
       { "name" : "default", "password" : "" },
       { "name" : "testb01", "password" : "" },
@@ -11,7 +12,8 @@
   },
   {
     "name" : "test1",
-    "url" : "http://localhost:8091",
+    "url" : "localhost:8091",
+    "nickelUrl" : "localhost:8093",
     "buckets" : [
       { "name" : "default", "password" : "" },
       { "name" : "testb11", "password" : "" },
@@ -21,7 +23,8 @@
   },
   {
     "name" : "test2",
-    "url" : "http://localhost:8091",
+    "url" : "localhost:8091",
+    "nickelUrl" : "localhost:8093",
     "buckets" : [
       { "name" : "default", "password" : "" },
       { "name" : "testb21", "password" : "" },

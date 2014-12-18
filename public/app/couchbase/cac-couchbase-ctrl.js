@@ -5,7 +5,7 @@
 
     function cacCouchbaseCtrl($scope, $location, cacDataContext, cacIdentity) {
         if(!cacIdentity.isAuthenticated()) {
-            //$location.path('/');
+            $location.path('/');
         }
 
         $scope.cacQuery = "";
@@ -28,9 +28,9 @@
                                     $scope.cacActionType,
                                     $scope.cacDryRun)
                 .then(function(results) {
-                    $scope.queryResults = JSON.stringify(results);
+                    $scope.queryResults = results;
                 }).catch(function(err) {
-                    $scope.queryResults = JSON.stringify(err);
+                    $scope.queryResults = err;
                 }).finally(function() {
                     $('#resultsWindow').modal({ keyboard : false });
                     $scope.dataSubmit = false;

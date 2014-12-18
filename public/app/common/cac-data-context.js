@@ -17,9 +17,9 @@
                         })
                 .then(function(data) {
                     dfr.resolve(data.data);
-                }).catch(function(err) {
-                    console.log("ERROR", err.message, err.stack());
-                    dfr.reject(err.message);
+                }).catch(function(data) {
+                    console.log("ERROR", data.data.error);
+                    dfr.reject(data.data);
                 });
 
             return dfr.promise;

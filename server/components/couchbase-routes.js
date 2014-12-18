@@ -1,4 +1,5 @@
-var _ = require('underscore');
+var _ = require('underscore'),
+    auth = require('./auth');
 
 module.exports = function(baseUrl, app, dbFactory) {
 
@@ -95,9 +96,10 @@ module.exports = function(baseUrl, app, dbFactory) {
                       request.body.dryRun,
                         function (error, docCount) {
                             if (error) {
-                                response.json(500, {error: error, documentCount: docCount});
+                                console.log("runQuery", error);
+                                response.status(500).json({error: error.toString(), documentCount: docCount});
                             } else {
-                                response.json({documentCount: docCount});
+                                response.status(200).json({documentCount: docCount});
                             }
                         });
     };
@@ -184,7 +186,7 @@ module.exports = function(baseUrl, app, dbFactory) {
     app.get(baseUrl + '/docs/:id', getById);
     app.post(baseUrl + '/docs', multiGetByIds);
     app.delete(baseUrl + '/docs', deleteDocs);
-    app.post(baseUrl + '/docs/query', runQuery);
+    app.post(baseUrl + '/docs/query', auth.requiresApiAuth(), runQuery);
     app.post(baseUrl + '/command', runCommand);
 
     return app;

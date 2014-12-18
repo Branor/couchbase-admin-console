@@ -62,7 +62,7 @@ form(role="form")
                |Query Results
 
          .modal-body
-            |{{queryResults}}
+            |{{queryResults | json}}
          .modal-footer
             button.btn.btn-default(type="button", data-dismiss="modal")
                |Close

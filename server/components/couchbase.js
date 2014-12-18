@@ -18,7 +18,8 @@ module.exports = function(config){
         for(var i = 0; i < clusters.length; ++i) {
             if(clusters[i].name == clusterName) {
                 result.clusterUrl = clusters[i].url;
-                for(var j = 0; j < clusters[i].buckets; ++j) {
+                result.nickelUrl = clusters[i].nickelUrl;
+                for(var j = 0; j < clusters[i].buckets.length; ++j) {
                     if(clusters[i].buckets[j].name == bucketName) {
                         result.bucketName = clusters[i].buckets[j].name;
                         result.bucketPass = clusters[i].buckets[j].password;
@@ -41,6 +42,9 @@ module.exports = function(config){
             if (error) throw error;
         });
         self.bucket.operationTimeout = 10000;
+        console.log(self.bucketData, cluster, self.bucket);
+        self.bucket.enableN1ql(self.bucketData.nickelUrl);
+
 
         self.findUser = function(user) {
             var dfr = q.defer();
@@ -136,13 +140,14 @@ module.exports = function(config){
         };
 
         self.runCommand = function(predicate, propName, propVal, queryType, dryRun, commandCallback) {
-            runNickelQuery(predicate, self.bucketData.bucketName, function (error, results) {
+            console.log("runCommand", self.bucketData);
+            self.runNickelQuery(predicate, self.bucketData.bucketName, function (error, results) {
                 if(error)
                     return commandCallback(error);
 
                 async.eachLimit(results, self.config.maxProcessingParallelism, 
                     function (result, callback) {
-                        processData(result.docId, propName, propVal, queryType, dryRun, 0, callback);
+                        self.processData(result.docId, propName, propVal, queryType, dryRun, 0, callback);
                     }, 
                     function (err){
                         commandCallback(err, results ? results.length : null);
@@ -165,20 +170,20 @@ module.exports = function(config){
             if(tries >= self.config.maxDocumentUpdateRetries)
                 return callback('Unable to update document ' + docId + ' in ' + tries + ' tries.');
 
-            var processor = getProcessorFunction(queryType);
+            var processor = self.getProcessorFunction(queryType);
 
             self.bucket.get(docId, function (error, result) {
                 if(error)
                     return callback(error);
    
-                doc = processor(result.value, propName, propVal);
+                var doc = processor(result.value, propName, propVal);
                 if(dryRun)
                     return callback();
 
-                self.bucket.set(docId, doc, {cas : result.cas}, function (err, res) {
+                self.bucket.replace(docId, doc, {cas : result.cas}, function (err, res) {
                     if(err)
                         if(err.code == couchbase.errors.keyAlreadyExists)
-                            return processData(docId, propName, propVal, queryType, dryRun, tries + 1, callback);
+                            return self.processData(docId, propName, propVal, queryType, dryRun, tries + 1, callback);
                         else
                             return callback(err);
                     return callback();
@@ -192,13 +197,13 @@ module.exports = function(config){
                 'META().cas AS casValue ' +
                 'FROM ' + bucket + ' ' +
                 'WHERE ' + query;
-
-            self.bucket.query(queryCode, function (error, result) {
+            var nickelQuery = couchbase.N1qlQuery.fromString(queryCode);
+            self.bucket.query(nickelQuery, function (error, result) {
                 console.log('Executing N1QL: ' + queryCode);
                 if (error) {
                     console.log('N1QL - ' + error);
                 }
-                console.log(util.inspect(result));
+                console.log(result);
                 callback(error, result);
             });
         };
