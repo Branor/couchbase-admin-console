@@ -2,7 +2,8 @@ var couchbase = require('couchbase'),
     _ = require('underscore'),
     q = require('q'),
     helpers = require('./helpers'),
-    async = require('async');
+    async = require('async'),
+    vm = require('vm');
 
 module.exports = function(config){
     var config = config;
@@ -133,10 +134,11 @@ module.exports = function(config){
             return object;
         };
 
-        self.executeCustomExpression = function(object, expression) {
-            // eval(expression, object)
-
-            return object;
+        self.executeCustomExpression = function(doc, path, expression) {
+            console.log("executeCustomExpression before", doc, expression);
+            vm.runInNewContext(expression, {doc: doc}, self.config.customStackTraceFile);
+            console.log("executeCustomExpression after", doc, expression);
+            return doc;
         };
 
         self.runCommand = function(predicate, propName, propVal, queryType, dryRun, commandCallback) {

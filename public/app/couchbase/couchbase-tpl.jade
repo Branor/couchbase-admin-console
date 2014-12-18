@@ -39,7 +39,8 @@ form(role="form")
          .col-sm-12(ng-show="showPropertyCustom()")
             .form-group
                label(for="cacPropertyCustom") Property Expression
-               textarea#cacPropertyCustom.form-control(ng-model="cacPropertyCustom", placeholder="Property Custom", ng-disabled="dataSubmit")
+               textarea#cacPropertyCustom.form-control(ng-model="cacPropertyCustom", placeholder="Property Custom", ng-disabled="dataSubmit", aria-describedby="helpBlock")
+               span#helpBlock.help-block Refrence the document using the 'doc' keyword. Similar to writing the body of 'function(doc) { // your code here... }'
 
    .row
       .col-sm-3.col-sm-push-5.btn-group

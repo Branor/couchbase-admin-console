@@ -15,7 +15,8 @@ module.exports = {
         clusters : clusters,
         certificateOptions : certificateOptions,
         maxProcessingParallelism : 10,
-        maxDocumentUpdateRetries : 100
+        maxDocumentUpdateRetries : 100,
+        customStackTraceFile : rootPath + 'vm.log'
     },
     production : {
         rootPath : rootPath,
@@ -23,6 +24,7 @@ module.exports = {
         clusters : clusters,
         certificateOptions : certificateOptions,
         maxProcessingParallelism : 10,
-        maxDocumentUpdateRetries : 100
+        maxDocumentUpdateRetries : 100,
+        customStackTraceFile : rootPath + 'vm.log'
     }
 };
