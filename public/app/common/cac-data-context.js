@@ -28,8 +28,23 @@
             return dfr.promise;
         };
 
+        var encrypt = function(msg) {
+            var dfr = $q.defer();
+
+            $http.get('/api/encrypt/' + msg)
+                .then(function(data) {
+                    dfr.resolve(data.data.encrypted);
+                }).catch(function(err) {
+                    console.log(err);
+                    dfr.reject(err);
+                });
+
+            return dfr.promise;
+        };
+
         return {
-            runQuery : runQuery
+            runQuery : runQuery,
+            encrypt : encrypt
         };
     };
 })();

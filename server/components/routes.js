@@ -17,6 +17,10 @@ module.exports = function(app, dbFactory, config) {
         res.end();
     });
 
+    app.get('/api/encrypt/:msg', function(req, res) {
+        res.json({encrypted : helpers.encrypt(req.param('msg'))});
+    });
+
     app.get('*', function(req, res) {
         var _clusters = [];
         for(var i = 0; i < config.clusters.length; ++i) {

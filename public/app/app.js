@@ -11,6 +11,10 @@
                 templateUrl: '/partials/home/home-tpl',
                 controller: 'cacHomeCtrl'
             })
+            .when('/help', {
+                templateUrl: '/partials/help/help-tpl',
+                controller: 'cacHelpCtrl'
+            })
             .when('/couchbase', {
                 templateUrl: '/partials/couchbase/couchbase-tpl',
                 controller: 'cacCouchbaseCtrl'

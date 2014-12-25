@@ -43,7 +43,6 @@ module.exports = function(config){
             if (error) throw error;
         });
         self.bucket.operationTimeout = 10000;
-        console.log(self.bucketData, cluster, self.bucket);
         self.bucket.enableN1ql(self.bucketData.nickelUrl);
 
 
@@ -140,13 +139,14 @@ module.exports = function(config){
         };
 
         self.runCommand = function(predicate, propName, propVal, queryType, dryRun, commandCallback) {
-            console.log("runCommand", self.bucketData);
+            console.log("runCommandCom", predicate, self.bucketData);
             self.runNickelQuery(predicate, self.bucketData.bucketName, function (error, results) {
                 if(error)
                     return commandCallback(error);
-
+                console.log("runCommandCom: running async on " + results.length + " with " + self.config.maxProcessingParallelism + " 'thread'");
                 async.eachLimit(results, self.config.maxProcessingParallelism, 
                     function (result, callback) {
+                        console.log("processing data for docid " + result.docId);
                         self.processData(result.docId, propName, propVal, queryType, dryRun, 0, callback);
                     }, 
                     function (err){
@@ -198,12 +198,14 @@ module.exports = function(config){
                 'FROM ' + bucket + ' ' +
                 'WHERE ' + query;
             var nickelQuery = couchbase.N1qlQuery.fromString(queryCode);
+            var start = new Date().getTime();
             self.bucket.query(nickelQuery, function (error, result) {
                 console.log('Executing N1QL: ' + queryCode);
                 if (error) {
                     console.log('N1QL - ' + error);
                 }
-                console.log(result);
+                var end = new Date().getTime();
+                console.log("finished query. elapsed time: " + (end - start) + " ms.");
                 callback(error, result);
             });
         };

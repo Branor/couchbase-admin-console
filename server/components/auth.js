@@ -10,6 +10,7 @@ function authenticate(req, res, next) {
                     if(err) { return next(err); }
                     //console.log("authenticate", user, req.session);
                     req.session.userObj = user;
+                    req.session.cookie.maxAge = 1000 * 60 * 10; // set max age for authentication cookie - 10 minutes
                     res.send({ success : true, user : user});
                 });
             }

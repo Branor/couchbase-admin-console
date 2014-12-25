@@ -1,0 +1,19 @@
+section.row
+   .col-sm-12
+      h1 Welcome to the Couchabse Admin Console.
+
+   .col-sm-8
+      h2 Logging In
+      p To get started, from the main page, select the Cluster and the bucket, and enter you credentials for that bucket.
+      img.img-responsive.img-thumbnail(src="/images/login.png")
+      p.bg-info Remeber that authentication is made per-bucket. Meaning that one set of credentials are for one bucket. Diffrent buckets (even on the same cluster) do not share credentials.
+
+      h2 Querying
+      p After a succefull login, you will be redirected to the Query Editor Page.
+      p Here, you can enter your predicate for the query (in the form of a WHERE clause on a standard SQL Query)
+      p See the image below for an overview, and use the list below it to review the diffrent controls that are avaiable to you.
+      img.img-responsive.img-thumbnail(src="/images/query_editor.png")
+      ol
+         li Predicate editor - enter your predicate using standard syntax for a WHERE clause in an SQL query.
+         li Property Name - for Add/Delete/Change actions (see article Action Type) this field will be used to specify the field name upon an action will be taken. use dots ('.') to look for properties on nested sub-documents. Not relevant for Custom operations (see article Action Type)
+         li Property Value -

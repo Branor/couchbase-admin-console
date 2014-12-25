@@ -5,6 +5,7 @@ function randomRange(min, max) {
 }
 
 function encrypt(str) {
+    console.log(str);
     return bcrypt.hashSync(str, 10);
 }
 

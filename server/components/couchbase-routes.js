@@ -96,7 +96,7 @@ module.exports = function(baseUrl, app, dbFactory) {
                       request.body.dryRun,
                         function (error, docCount) {
                             if (error) {
-                                console.log("runQuery", error);
+                                console.log("runQuery Error", error);
                                 response.status(500).json({error: error.toString(), documentCount: docCount});
                             } else {
                                 response.status(200).json({documentCount: docCount});

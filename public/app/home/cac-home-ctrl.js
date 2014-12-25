@@ -1,7 +1,7 @@
 (function() {
-    angular.module('cacApp').controller('cacHomeCtrl', ['$scope', '$window', '$location', 'cacAuth', 'cacNotifier', cacHomeCtrl]);
+    angular.module('cacApp').controller('cacHomeCtrl', ['$scope', '$window', '$location', 'cacAuth', 'cacNotifier', 'cacDataContext', cacHomeCtrl]);
 
-    function cacHomeCtrl($scope, $window, $location, cacAuth, cacNotifier) {
+    function cacHomeCtrl($scope, $window, $location, cacAuth, cacNotifier, cacDataContext) {
         $scope.clusters = undefined;
         if(!!$window.cac_clusters_list) {
             $scope.clusters = $window.cac_clusters_list;
@@ -18,6 +18,13 @@
 
         $scope.chooseBucket = function(bucket) {
             $scope.chosenBucket = bucket;
+        };
+
+        $scope.encrypt = function() {
+            $scope.newStub = "Generating...";
+            cacDataContext.encrypt($scope.newPassword).then(function(encryptedPass) {
+                $scope.newStub = '"'+$scope.newUsername+'": "'+encryptedPass+'"';
+            });
         };
 
         $scope.signin = function() {

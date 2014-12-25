@@ -1,0 +1,4 @@
+Credentials per Cluster on config.json
+add option to view documents (in a new tab, plain/text)
+add attempted vs success documents
+Deployment Notes
