@@ -8,7 +8,6 @@ function authenticate(req, res, next) {
             else {
                 req.logIn(user, function(err) {
                     if(err) { return next(err); }
-                    //console.log("authenticate", user, req.session);
                     req.session.userObj = user;
                     req.session.cookie.maxAge = 1000 * 60 * 10; // set max age for authentication cookie - 10 minutes
                     res.send({ success : true, user : user});
@@ -18,17 +17,6 @@ function authenticate(req, res, next) {
     });
 
     auth(req, res, next);
-}
-
-function requiresApiRole(role) {
-    return function(req, res, next) {
-        if(req.isAuthenticated() && req.user.data && req.user.data.roles && req.user.data.roles.indexOf(role) > -1) {
-            next();
-        } else {
-            res.status(403);
-            res.end();
-        }
-    }
 }
 
 function requiresApiAuth() {
@@ -44,6 +32,5 @@ function requiresApiAuth() {
 
 module.exports = {
     authenticate : authenticate,
-    requiresApiRole : requiresApiRole,
     requiresApiAuth : requiresApiAuth
 };

@@ -6,7 +6,7 @@ section.row
                Choose a Cluster...
             .panel-body
                ul.list-group
-                  li.list-group-item(ng-repeat="cluster in clusters", ng-class="{'list-group-item-info' : cluster.name == chosenCluster.name}", ng-click="chooseCluster(cluster)").
+                  li.list-group-item(ng-repeat="(clusterKey, cluster) in clusters", ng-class="{'list-group-item-info' : cluster.name == chosenCluster.name}", ng-click="chooseCluster(clusterKey)").
                      {{cluster.name}}
       .col-sm-4
          .panel.panel-primary(ng-show="buckets.length > 0")

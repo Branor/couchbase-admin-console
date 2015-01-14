@@ -18,7 +18,7 @@ if (cluster.isMaster) {
     var config = require('./server/components/config')[env];
     var dbFactory = require('./server/components/couchbase')(config);
 
-    require('./server/components/passport')(dbFactory);
+    require('./server/components/passport')(config);
     require('./server/components/express')(app, config);
     require('./server/components/routes')(app, dbFactory, config);
 

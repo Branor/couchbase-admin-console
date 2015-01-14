@@ -22,15 +22,16 @@ module.exports = function(app, dbFactory, config) {
     });
 
     app.get('*', function(req, res) {
-        var _clusters = [];
-        for(var i = 0; i < config.clusters.length; ++i) {
-            var tmpCluster = { name : config.clusters[i].name, buckets : []};
+        var _clusters = {};
+        for(var clusterCode in config.clusters) {
+            _clusters[clusterCode] = {
+                name: config.clusters[clusterCode].name,
+                buckets: []
+            };
 
-            for(var j = 0; j < config.clusters[i].buckets.length; ++j) {
-                tmpCluster.buckets.push( { name : config.clusters[i].buckets[j].name });
+            for(var i = 0; i < config.clusters[clusterCode].buckets.length; ++i) {
+                _clusters[clusterCode].buckets.push( { name : config.clusters[clusterCode].buckets[i].name });
             }
-
-            _clusters.push(tmpCluster);
         }
         res.render('index', {
             clusters: _clusters,

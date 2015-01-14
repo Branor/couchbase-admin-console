@@ -9,11 +9,13 @@
         $scope.buckets = null;
 
         $scope.chosenCluster = null;
+        $scope.chosenClusterKey = null;
         $scope.chosenBucket = null;
 
-        $scope.chooseCluster = function(cluster) {
-            $scope.chosenCluster = cluster;
-            $scope.buckets = cluster.buckets;
+        $scope.chooseCluster = function(clusterKey) {
+            $scope.chosenClusterKey = clusterKey;
+            $scope.chosenCluster = $scope.clusters[$scope.chosenClusterKey];
+            $scope.buckets = $scope.chosenCluster.buckets;
         };
 
         $scope.chooseBucket = function(bucket) {
@@ -28,7 +30,7 @@
         };
 
         $scope.signin = function() {
-            var compositeUsername = $scope.chosenCluster.name + "|" + $scope.chosenBucket.name + "|" + $scope.username;
+            var compositeUsername = $scope.chosenClusterKey + "|" + $scope.chosenBucket.name + "|" + $scope.username;
                 cacAuth.authenticate(compositeUsername, $scope.password).then(
                 function(username) {
                     if(username) {

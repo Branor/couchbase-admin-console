@@ -45,48 +45,6 @@ module.exports = function(config){
         self.bucket.operationTimeout = 10000;
         self.bucket.enableN1ql(self.bucketData.nickelUrl);
 
-
-        self.findUser = function(user) {
-            var dfr = q.defer();
-
-            self.bucket.get('cb::manager::users', function (error, result) {
-                if (error) {
-                    dfr.notify(error);
-                    dfr.reject("Error finding Users document");
-                }
-                if (result && result.value && result.value[user]) {
-                    dfr.resolve(result.value[user]);
-                }
-                dfr.reject("No user found");
-            });
-
-            return dfr.promise;
-        };
-
-        self.authenticate = function (username, password) {
-            var dfr = q.defer();
-
-            self.bucket.get('cb::manager::users', function (error, result) {
-                if (error) {
-                    console.error(error);
-                    dfr.reject("Error finding Users document");
-                } else {
-                    if (!result.value || !result.value[username]) {
-                        dfr.resolve(false);
-                    }
-                    var savedPassword = result.value[username];
-
-                    if(helpers.compare(savedPassword, password)) {
-                        dfr.resolve(username);
-                    } else {
-                        dfr.resolve(false);
-                    }
-                }
-            });
-
-            return dfr.promise;
-        };
-
         self.setValueByPath = function (object, path, value) {
             var a = path.split('.');
             var o = object;

@@ -11,7 +11,7 @@ module.exports = function(app, config) {
         return stylus(str).set('filename', path);
     }
 
-    app.set('views', config.rootPath + '/server/views');
+    app.set('views', config.rootPath + 'server/views');
     app.set('view engine', 'jade');
 
     app.use(logger('dev'));
@@ -26,5 +26,5 @@ module.exports = function(app, config) {
         compile: compile
     }));
 
-    app.use(express.static(config.rootPath + '/public'));
+    app.use(express.static(config.rootPath + 'public'));
 };

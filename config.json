@@ -1,35 +1,83 @@
-[
-  {
-    "name" : "localhost",
-    "url" : "localhost:8091",
-    "nickelUrl" : "localhost:8093",
-    "buckets" : [
-      { "name" : "default", "password" : "" },
-      { "name" : "testb01", "password" : "" },
-      { "name" : "testb02", "password" : "" },
-      { "name" : "testb03", "password" : "" }
+{
+  "cluster1": {
+    "name": "Cluster 1",
+    "url": "localhost:8091",
+    "nickelUrl": "localhost:8093",
+    "credentials": {
+      "username": "eyal",
+      "password": "$2a$10$7Xmq4e7T00MPYkBeGuAkTuBeEinOplDyg8HHP2.i6VHz0ov6XHWm6"
+    },
+    "buckets": [
+      {
+        "name": "default",
+        "password": ""
+      },
+      {
+        "name": "testb01",
+        "password": ""
+      },
+      {
+        "name": "testb02",
+        "password": ""
+      },
+      {
+        "name": "testb03",
+        "password": ""
+      }
     ]
   },
-  {
-    "name" : "test1",
-    "url" : "localhost:8091",
-    "nickelUrl" : "localhost:8093",
-    "buckets" : [
-      { "name" : "default", "password" : "" },
-      { "name" : "testb11", "password" : "" },
-      { "name" : "testb12", "password" : "" },
-      { "name" : "testb13", "password" : "" }
+  "cluster2": {
+    "name": "Cluster 2",
+    "url": "localhost:8091",
+    "nickelUrl": "localhost:8093",
+    "credentials": {
+      "username": "eyal2",
+      "password": "$2a$10$7Xmq4e7T00MPYkBeGuAkTuBeEinOplDyg8HHP2.i6VHz0ov6XHWm6"
+    },
+    "buckets": [
+      {
+        "name": "default",
+        "password": ""
+      },
+      {
+        "name": "testb11",
+        "password": ""
+      },
+      {
+        "name": "testb12",
+        "password": ""
+      },
+      {
+        "name": "testb13",
+        "password": ""
+      }
     ]
   },
-  {
-    "name" : "test2",
-    "url" : "localhost:8091",
-    "nickelUrl" : "localhost:8093",
-    "buckets" : [
-      { "name" : "default", "password" : "" },
-      { "name" : "testb21", "password" : "" },
-      { "name" : "testb22", "password" : "" },
-      { "name" : "testb23", "password" : "" }
+  "cluster3": {
+    "name": "Cluster 3",
+    "url": "localhost:8091",
+    "nickelUrl": "localhost:8093",
+    "credentials": {
+      "username": "eyal3",
+      "password": "$2a$10$7Xmq4e7T00MPYkBeGuAkTuBeEinOplDyg8HHP2.i6VHz0ov6XHWm6"
+    },
+    "buckets": [
+      {
+        "name": "default",
+        "password": ""
+      },
+      {
+        "name": "testb21",
+        "password": ""
+      },
+      {
+        "name": "testb22",
+        "password": ""
+      },
+      {
+        "name": "testb23",
+        "password": ""
+      }
     ]
   }
-]
+}
