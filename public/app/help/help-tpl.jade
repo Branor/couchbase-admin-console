@@ -1,25 +1,42 @@
-section.row
-   .col-sm-12
-      h1 Welcome to the Couchabse Admin Console.
+section
+   .row
+      .col-sm-12
+         h1 Welcome to the Couchabse Admin Console.
+   .row
+      .col-sm-8
+         h2 Logging In
+         p To get started, from the main page, select the Cluster and the bucket, and enter you credentials for that cluster.
+         img.img-responsive.img-thumbnail(src="/images/login.png")
+         p.bg-info Remeber that authentication is made per-cluster, and are held on a configuration file (config.json)
 
-   .col-sm-8.col-sm-push-2
-      h2 Logging In
-      p To get started, from the main page, select the Cluster and the bucket, and enter you credentials for that cluster.
-      img.img-responsive.img-thumbnail(src="/images/login.png")
-      p.bg-info Remeber that authentication is made per-cluster, and are held on a configuration file (config.json)
+         h2 Querying
+         p After a succefull login, you will be redirected to the Query Editor Page.
+         p Here, you can enter your predicate for the query (in the form of a WHERE clause on a standard SQL Query)
+         p See the image below for an overview, and use the list below it to review the diffrent controls that are avaiable to you.
+         img.img-responsive.img-thumbnail(src="/images/query_editor.png")
+         ol
+            li Predicate editor - enter your predicate using standard syntax for a WHERE clause in an SQL query.
+            li Property Name - for Add/Delete/Change actions (see article Action Type) this field will be used to specify the field name upon an action will be taken. use dots ('.') to look for properties on nested sub-documents. Not relevant for Custom operations (see article Action Type)
+            li Property Value - for Add/Change actions, this is the new value that will be assigned to the property (given in article 2). for Custom operation, this field will be replaced with a textbox to hold the custom expression/function to perform on each document (in Custom operations, the fields 'Property Name' and 'Property Value' are meaning-less since the customer function will be performed on the whole document).
+            li Actions - choose the action type you want to perform.
+               ol(type='a')
+                  li
+                     div 'Add Property' will add a new property to each of the matching documents, with the given name (article 2) and the given value (article 3).
+                     div In case the property already exists, a warning will be shown on the operation summary, but the operation will be executed.
+                  li 'Delete Property' will delete the property with a given name (article 2). If the given property is not found, no errors/warnings will be shown.
+                  li
+                     div 'Change Property Value' will change an existing property (article 2) and set it to a new value (article 3) to each of the matching documents.
+                     div In case the property does not exists, a warning will be shown on the operation summary, but the operation will be executed.
+                  li
+                     div 'Change Property Value - Custom' will perform a javascript action on each of the matching documents.
+                     div When choosing this option, a textarea will appear titled 'Property Expression'. This is the place to write your custom javascript, that will be executed for each document.
+                     div In Javascript terms, you write a function that receives the document as an argument (named 'doc'). In a more practicel terms, the javascript snippet will be executed in a sandboxed enviorment to ensure no melicous code will be executed over the server.
+            li Dry Run - when enabled, the operation will be simulated only. All operations will be executed in memory (so warnings will arise when necessry), but no save operation will take place. When disabled, the same process will take place, only with save operation.
+            li Submit
+         p.bg-info Notice: when you click the submit button, all fields will be disabled until the operation is finished. When the operation finishes, a window will pop-up with summary info about the operation.
 
-      h2 Querying
-      p After a succefull login, you will be redirected to the Query Editor Page.
-      p Here, you can enter your predicate for the query (in the form of a WHERE clause on a standard SQL Query)
-      p See the image below for an overview, and use the list below it to review the diffrent controls that are avaiable to you.
-      img.img-responsive.img-thumbnail(src="/images/query_editor.png")
-      ol
-         li Predicate editor - enter your predicate using standard syntax for a WHERE clause in an SQL query.
-         li Property Name - for Add/Delete/Change actions (see article Action Type) this field will be used to specify the field name upon an action will be taken. use dots ('.') to look for properties on nested sub-documents. Not relevant for Custom operations (see article Action Type)
-         li Property Value - for Add/Change actions, this is the new value that will be assigned to the property (given in article 2). for Custom operation, this field will be replaced with a textbox to hold the custom expression/function to perform on each document (in Custom operations, the fields 'Property Name' and 'Property Value' are meaning-less since the customer function will be performed on the whole document).
-         li Actions - choose the action type you want to perform.
-            ol
-               li 'Add Property' will add a new property to each of the matching documents, with the given name (article 2) and the given value (article 3).
-               li 'Delete Property' will delete the property with a given name (article 2). If the given property is not found, no errors will be thrown.
-               li 'Change Property Value'
+         h2 Changing a password for a cluster
+         p All clusters are registed in a config.json file on the server. Each cluster holds a specific set of credentials to enable logging for each cluster.
+         p Passwords are encrypted on the config.json file, so in order to reset them, you can go to the 'Generate Hash' page and enter the required details. This operation will not change anything on the config.json file, but rather will output a snippet that you can copy and paste to the config.json file. Hence, only people with server access can reset passwords.
+
 
