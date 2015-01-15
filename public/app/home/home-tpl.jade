@@ -1,6 +1,6 @@
 section.row
    .row
-      .col-sm-4
+      .col-sm-4#clusterList
          .panel.panel-primary
             .panel-heading.
                Choose a Cluster...
@@ -8,7 +8,7 @@ section.row
                ul.list-group
                   li.list-group-item(ng-repeat="(clusterKey, cluster) in clusters", ng-class="{'list-group-item-info' : cluster.name == chosenCluster.name}", ng-click="chooseCluster(clusterKey)").
                      {{cluster.name}}
-      .col-sm-4
+      .col-sm-4#bucketList
          .panel.panel-primary(ng-show="buckets.length > 0")
             .panel-heading.
                Choose a Bucket...
@@ -29,21 +29,3 @@ section.row
                      label(for="password") Password:
                      input.form-control(type="password", id="password", name="password", ng-model="password", placeholder="Password")
                   button.btn.btn-primary(type="submit") Login
-   .row
-      .col-sm-12
-         .panel.panel-default
-            .panel-heading.
-               Create a stub for a new user
-            .panel-body
-               form(ng-submit="encrypt()")
-                  div.form-group
-                     label(for="newUsername") Username
-                     input#newUsername.form-control(type="text",ng-model="newUsername",placeholder="Enter Username")
-                  div.form-group
-                     label(for="newPassword") Password
-                     input#newPassword.form-control(type="text",ng-model="newPassword",placeholder="Enter Password")
-                  input.btn.btn-default(type="submit", value="Generate")
-                  div.form-group
-                     label(for="newStub") Stub
-                     input#newStub.form-control(type="text",ng-model="newStub",placeholder="", readonly="readonly")
-                     span.help-block Insert the generated stub as a new key-value pair to the 'cb::manager::users' document on the target bucket.

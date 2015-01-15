@@ -22,13 +22,6 @@
             $scope.chosenBucket = bucket;
         };
 
-        $scope.encrypt = function() {
-            $scope.newStub = "Generating...";
-            cacDataContext.encrypt($scope.newPassword).then(function(encryptedPass) {
-                $scope.newStub = '"'+$scope.newUsername+'": "'+encryptedPass+'"';
-            });
-        };
-
         $scope.signin = function() {
             var compositeUsername = $scope.chosenClusterKey + "|" + $scope.chosenBucket.name + "|" + $scope.username;
                 cacAuth.authenticate(compositeUsername, $scope.password).then(

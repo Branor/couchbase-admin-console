@@ -1,0 +1,29 @@
+section.row
+   .col-sm-6
+      .panel.panel-primary
+         .panel-heading Create a stub for a new user
+         .panel-body
+            form(ng-submit="encrypt()")
+               .form-group
+                  label(for="newUsername") Username
+                  input#newUsername.form-control(type="text",ng-model="newUsername",placeholder="Enter Username")
+               .form-group
+                  label(for="newPassword") Password
+                  input#newPassword.form-control(type="text",ng-model="newPassword",placeholder="Enter Password")
+               .form-group
+                  input.btn.btn-primary(type="submit", value="Generate")
+               .form-group
+                  label(for="newStub") Stub
+                  input#newStub.form-control(type="text",ng-model="newStub",placeholder="", readonly="readonly")
+                  span.help-block Insert the generated stub in the config.json file, for the oppropriate cluster configuration
+   .col-sm-6
+      .panel.panel-info
+         .panel-heading Help
+         .panel-body
+            p
+            | Each cluster in the configuration holds a set of credentails for accessing that cluster.<br />
+            | The password for that credentials are hashed.<br />
+            | To generate/change password for a cluster, you can use this tool to generate the needed configuration and paste those credentails in your configuration file (config.json)<br />
+            p
+               strong Note:
+               | In order for the new password to take effect, the tool has to be restarted!

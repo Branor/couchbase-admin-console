@@ -15,6 +15,10 @@
                 templateUrl: '/partials/help/help-tpl',
                 controller: 'cacHelpCtrl'
             })
+            .when('/generate', {
+                templateUrl: '/partials/generate/generate-tpl',
+                controller: 'cacGenerateCtrl'
+            })
             .when('/couchbase', {
                 templateUrl: '/partials/couchbase/couchbase-tpl',
                 controller: 'cacCouchbaseCtrl'

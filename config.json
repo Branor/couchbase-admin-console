@@ -30,10 +30,7 @@
     "name": "Cluster 2",
     "url": "localhost:8091",
     "nickelUrl": "localhost:8093",
-    "credentials": {
-      "username": "eyal2",
-      "password": "$2a$10$7Xmq4e7T00MPYkBeGuAkTuBeEinOplDyg8HHP2.i6VHz0ov6XHWm6"
-    },
+    "credentials": { "username": "eyal2", "password": "$2a$10$7Xmq4e7T00MPYkBeGuAkTuBeEinOplDyg8HHP2.i6VHz0ov6XHWm6" },
     "buckets": [
       {
         "name": "default",

@@ -5,6 +5,12 @@ block main-content
       .container
          .navbar-header
             a.navbar-brand(href="/") Couchbase Admin Console
+         div
+            ul.nav.navbar-nav
+               li
+                  a(href="/help") Help
+               li
+                  a(href="/generate") Generate Hash
          div(ng-include="'/partials/account/navbar-right-tpl'")
    section#main.container(ng-view)
 
