@@ -1,7 +1,6 @@
 var couchbase = require('couchbase'),
     _ = require('underscore'),
     q = require('q'),
-    helpers = require('./helpers'),
     async = require('async'),
     vm = require('vm');
 
@@ -16,17 +15,12 @@ module.exports = function(config){
         var result = {};
         var clusters = getConfig().clusters;
 
-        for(var i = 0; i < clusters.length; ++i) {
-            if(clusters[i].name == clusterName) {
-                result.clusterUrl = clusters[i].url;
-                result.nickelUrl = clusters[i].nickelUrl;
-                for(var j = 0; j < clusters[i].buckets.length; ++j) {
-                    if(clusters[i].buckets[j].name == bucketName) {
-                        result.bucketName = clusters[i].buckets[j].name;
-                        result.bucketPass = clusters[i].buckets[j].password;
-                        break;
-                    }
-                }
+        result.clusterUrl = clusters[clusterName].url;
+        result.nickelUrl = clusters[clusterName].nickelUrl;
+        for(var j = 0; j < clusters[clusterName].buckets.length; ++j) {
+            if(clusters[clusterName].buckets[j].name == bucketName) {
+                result.bucketName = clusters[clusterName].buckets[j].name;
+                result.bucketPass = clusters[clusterName].buckets[j].password;
                 break;
             }
         }
@@ -44,22 +38,57 @@ module.exports = function(config){
         });
         self.bucket.operationTimeout = 10000;
         self.bucket.enableN1ql(self.bucketData.nickelUrl);
+        self._vmContext = null;
 
+        self.resetCounters = function() {
+            self.counters = {};
+            self.counters.matched = 0;
+            self.counters.warnings = {};
+            self.counters.errors = {};
+            self.counters.saved = 0;
+            self.counters.start = new Date().getTime();
+        };
+
+        // for change or add actions.
         self.setValueByPath = function (object, path, value) {
-            var a = path.split('.');
-            var o = object;
-            for (var i = 0; i < a.length - 1; i++) {
+            var a = path.split('.'); // parse the given path of the property
+            var o = object; // assign the pointer to the object
+            for (var i = 0; i < a.length - 1; i++) { // loop through path (except for the last part)
                 var n = a[i];
-                if (!(n in o)) {
-                    o[n] = {};
+                if (!(n in o)) { // if the given property is not in the object
+                    o[n] = {}; // create the new object
                 }
-                o = o[n];
+                o = o[n]; // point to the sub object
             }
+            // the pointer 'o' is now pointing to the lowest level of tree so we just assign the value to the last part of the path (not looped in the last loop)
             o[a[a.length - 1]] = value;
 
             return object;
         };
 
+        // for add actions - if property already exists, will add a warning, but resume action
+        self.addValueByPath = function(object, path, value) {
+            if(typeof(self.getValueByPath(object, path)) !== 'undefined') {
+                if(typeof(self.counters.warnings['property-already-exists']) === 'undefined') {
+                    self.counters.warnings['property-already-exists'] = 0;
+                }
+                ++self.counters.warnings['property-already-exists'];
+            }
+            return self.setValueByPath(object, path, value);
+        };
+
+        // for change actions - if property not exists, will add a warning, but resume action
+        self.changeValueByPath = function(object, path, value) {
+            if(typeof(self.getValueByPath(object, path)) === 'undefined') {
+                if(typeof(self.counters.warnings['property-does-not-exists']) === 'undefined') {
+                    self.counters.warnings['property-does-not-exists'] = 0;
+                }
+                ++self.counters.warnings['property-does-not-exists'];
+            }
+            return self.setValueByPath(object, path, value);
+        };
+
+        // will return the value of the specified path in a given object.
         self.getValueByPath = function (object, path) {
             var o = object;
             path = path.replace(/\[(\w+)\]/g, '.$1');
@@ -76,6 +105,7 @@ module.exports = function(config){
             return o;
         };
 
+        // will delete a property by path on an object
         self.deleteValueByPath = function (object, path) {
             var a = path.split('.');
             var o = object;
@@ -91,42 +121,57 @@ module.exports = function(config){
             return object;
         };
 
+        // will execute a custom expression on an object
         self.executeCustomExpression = function(doc, path, expression) {
-            vm.runInNewContext(expression, {doc: doc}, self.config.customStackTraceFile);
+            if(!self._vmContext) self._vmContext = vm.createContext();
+            self._vmContext.doc = doc;
+            vm.runInContext(expression, self._vmContext, self.config.customStackTraceFile);
             return doc;
         };
 
+        // main entry point - will run an N1QL query, to get document ids, and then run the process (according to type)
         self.runCommand = function(predicate, propName, propVal, queryType, dryRun, commandCallback) {
-            console.log("runCommandCom", predicate, self.bucketData);
+            self.resetCounters();
             self.runNickelQuery(predicate, self.bucketData.bucketName, function (error, results) {
                 if(error)
                     return commandCallback(error);
                 console.log("runCommandCom: running async on " + results.length + " with " + self.config.maxProcessingParallelism + " 'thread'");
+                self.counters.matched = results.length;
                 async.eachLimit(results, self.config.maxProcessingParallelism, 
                     function (result, callback) {
-                        console.log("processing data for docid " + result.docId);
                         self.processData(result.docId, propName, propVal, queryType, dryRun, 0, callback);
                     }, 
                     function (err){
-                        commandCallback(err, results ? results.length : null);
+                        if(self._vmContext) self._vmContext = null;
+                        self.counters.finish = new Date().getTime();
+                        self.counters.elapsed = ((self.counters.finish - self.counters.start) / 1000) + " seconds";
+                        delete self.counters.start;
+                        delete self.counters.finish;
+                        commandCallback(err, self.counters);
                     }
                 );
             });
         };
 
+        // decide on action to perform
         self.getProcessorFunction = function(queryType) {
             switch(queryType) {
-                case 'add': return self.setValueByPath;
-                case 'change-value': return self.setValueByPath;
+                case 'add': return self.addValueByPath;
+                case 'change-value': return self.changeValueByPath;
                 case 'delete': return self.deleteValueByPath;
                 case 'change-custom': return self.executeCustomExpression;
             }
         };
 
-        self.processData = function(docId, propName, propVal, queryType, dryRun, tries, callback)
-        {
-            if(tries >= self.config.maxDocumentUpdateRetries)
+        // handle each document in the result set (get document id, get document, perform action and save or not - depending on dryrun value)
+        self.processData = function(docId, propName, propVal, queryType, dryRun, tries, callback) {
+            if(tries >= self.config.maxDocumentUpdateRetries) {
+                if(typeof(self.counters.errors['max-write-attemptes']) === 'undefined') {
+                    self.counters.errors['max-write-attemptes'] = 0;
+                }
+                ++self.counters.errors['max-write-attemptes'];
                 return callback('Unable to update document ' + docId + ' in ' + tries + ' tries.');
+            }
 
             var processor = self.getProcessorFunction(queryType);
 
@@ -140,10 +185,16 @@ module.exports = function(config){
 
                 self.bucket.replace(docId, doc, {cas : result.cas}, function (err, res) {
                     if(err)
-                        if(err.code == couchbase.errors.keyAlreadyExists)
+                        if(err.code == couchbase.errors.keyAlreadyExists) {
                             return self.processData(docId, propName, propVal, queryType, dryRun, tries + 1, callback);
-                        else
+                        } else {
+                            if(typeof(self.counters.errors[err.code]) === 'undefined') {
+                                self.counters.errors[err.code] = 0;
+                            }
+                            ++self.counters.errors[err.code];
                             return callback(err);
+                        }
+                    ++self.counters.saved;
                     return callback();
                 });
             });

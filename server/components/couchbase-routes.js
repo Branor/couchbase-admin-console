@@ -94,100 +94,20 @@ module.exports = function(baseUrl, app, dbFactory) {
                       request.body.propVal,
                       request.body.queryType,
                       request.body.dryRun,
-                        function (error, docCount) {
+                        function (error, counters) {
                             if (error) {
                                 console.log("runQuery Error", error);
-                                response.status(500).json({error: error.toString(), documentCount: docCount});
+                                response.status(500).json({error: error.toString(), counters: counters});
                             } else {
-                                response.status(200).json({documentCount: docCount});
+                                response.status(200).json({counters: counters});
                             }
                         });
-    };
-
-    var runCommand = function (request, response) {
-        var db = getDb(request);
-        var requestJson = request.body;
-        var commandType = requestJson.commandType;
-        var queryDetails = requestJson.queryDetails;
-        var pathToModify = requestJson.pathToModify;
-        var newValue = requestJson.newValue;
-        var kvToUpsert = {};
-        var status = 200;
-        var message = 'There are errors with your input:';
-
-
-        //Run validations
-        var flag = 1;
-        _.each(commandTypes, function (commandTypeFromEnum) {
-            if (commandType == commandTypeFromEnum)
-                flag = 0;
-        });
-        if (flag == 1) {
-            status = 404;
-            message += '\nCommand type is not found'
-        }
-
-        if (!newValue && commandType != commandTypes.removeProperty && flag == 0) {
-            status = 404;
-            message += '\nNo new value provided for the given command type'
-        }
-
-        if (!pathToModify) {
-            status = 500;
-            message += '\nPath to modify was not supplied';
-        }
-
-        if (status != 200) {
-            response.send(status, message);
-            return;
-        }
-
-        //Run the query which will provide the keys for the action
-        db.runNickelQuery(queryDetails, 0, function (error, results) {
-            if (error) {
-                response.json(500, util.inspect(error));
-            } else {
-                _.each(results, function (result) {
-                    var documentKey = result.docId;
-                    kvToUpsert[documentKey] = { value: result };
-                    delete kvToUpsert[documentKey].value.docId;
-                    if (commandType == commandTypes.addProperty) {
-                        if (db.getValueByPath(kvToUpsert[documentKey].value, pathToModify)) {
-                            console.log('property already exists in key ' + documentKey);
-                            delete kvToUpsert[documentKey];
-                        }
-                        else {
-                            db.setValueByPath(kvToUpsert[documentKey].value, pathToModify, newValue);
-                        }
-                    }
-                    else if (commandType == commandTypes.modifyProperty) {
-                        db.setValueByPath(kvToUpsert[documentKey].value, pathToModify, newValue);
-                    }
-                    else if (commandType == commandTypes.removeProperty) {
-                        db.deleteValueByPath(kvToUpsert[documentKey].value, pathToModify);
-                    }
-                });
-
-                if (_.size(kvToUpsert) > 0)
-                    db.setMulti(kvToUpsert, {persist_to: 1}, function (setError, setResult) {
-                        if (setError) {
-                            console.log('Error on Set: ' + setError.message);
-                            response.json(500, setError);
-                        }
-                        else
-                            response.json(setResult);
-                    });
-                else
-                    response.send(204);
-            }
-        });
     };
 
     app.get(baseUrl + '/docs/:id', getById);
     app.post(baseUrl + '/docs', multiGetByIds);
     app.delete(baseUrl + '/docs', deleteDocs);
     app.post(baseUrl + '/docs/query', auth.requiresApiAuth(), runQuery);
-    app.post(baseUrl + '/command', runCommand);
 
     return app;
 };
