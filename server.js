@@ -3,7 +3,7 @@ var https = require('https'),
 
 var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
-if (cluster.isMaster) {
+if (process.argv.indexOf("debug") === -1 && cluster.isMaster) {
     // Count the machine's CPUs
     var cpuCount = require('os').cpus().length;
 
