@@ -185,6 +185,7 @@ module.exports = function(config){
 
                 self.bucket.replace(docId, doc, {cas : result.cas}, function (err, res) {
                     if(err)
+                        // if err code is keyAlready exists, it means that cas has changed - someone updated the document since we queried about it.
                         if(err.code == couchbase.errors.keyAlreadyExists) {
                             return self.processData(docId, propName, propVal, queryType, dryRun, tries + 1, callback);
                         } else {
